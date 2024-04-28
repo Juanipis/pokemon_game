@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 import 'package:pokemon_game/api/models/pokemon.dart';
 
@@ -10,8 +12,11 @@ class PokemonLoadingState extends PokemonState {
 
 class PokemonLoadedState extends PokemonState {
   final Pokemon pokemon;
+  final Uint8List pokemonArtworkColor;
+  final Uint8List pokemonArtworkBlackWhite;
 
-  PokemonLoadedState(this.pokemon);
+  PokemonLoadedState(
+      this.pokemon, this.pokemonArtworkColor, this.pokemonArtworkBlackWhite);
 
   @override
   List<Object> get props => [pokemon];
