@@ -32,7 +32,7 @@ class PokemonErrorState extends PokemonState {
 }
 
 class PokemonRandomNamesState extends PokemonState {
-  final Map<int, String> pokemonNames;
+  final List<String> pokemonNames;
 
   PokemonRandomNamesState(this.pokemonNames);
 

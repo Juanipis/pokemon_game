@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_bloc.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_event.dart';
+import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_names_bloc.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_state.dart';
 import 'package:pokemon_game/api/service/pokemon_service.dart';
 import 'package:pokemon_game/presentation/widgets/pokemon_view.dart';
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider<PokemonBloc>(
             create: (context) => PokemonBloc(pokemonService),
-          )
+          ),
+          BlocProvider(create: (context) => PokemonNamesBloc(pokemonService))
         ],
         child: MaterialApp(
           title: 'Pokemon Game',
