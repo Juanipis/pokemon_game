@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_event.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_state.dart';
