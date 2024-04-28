@@ -30,3 +30,12 @@ class PokemonErrorState extends PokemonState {
   @override
   List<Object> get props => [message];
 }
+
+class PokemonRandomNamesState extends PokemonState {
+  final Map<int, String> pokemonNames;
+
+  PokemonRandomNamesState(this.pokemonNames);
+
+  @override
+  List<Object> get props => [pokemonNames];
+}

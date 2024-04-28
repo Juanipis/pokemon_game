@@ -78,8 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             context.read<PokemonBloc>().add(GetPokemonByIdEvent(
-                  // add a random number between 1 and 898
-                  Random().nextInt(898) + 1,
+                  Random().nextInt(1025),
                 ));
           },
           tooltip: 'Increment',

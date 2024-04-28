@@ -10,3 +10,11 @@ class GetPokemonByIdEvent extends PokemonEvent {
   @override
   List<Object> get props => [id];
 }
+
+class GetRandomPokemonNamesEvent extends PokemonEvent {
+  final int count;
+
+  GetRandomPokemonNamesEvent({required this.count});
+  @override
+  List<Object> get props => [];
+}

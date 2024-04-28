@@ -27,11 +27,6 @@ class _PokemonViewState extends State<PokemonView> {
     return Column(
       children: [
         const Text('Pokemon:'),
-        Text('Name: ${widget.pokemon.name}'),
-        Text('Height: ${widget.pokemon.height}'),
-        Text('Weight: ${widget.pokemon.weight}'),
-
-        // Display the image in black and white if the isBlackAndWhite is true
         Image.memory(isBlackAndWhite
             ? widget.pokemonArtworkBlackWhite
             : widget.pokemonArtworkColor),
