@@ -4,6 +4,8 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
+import 'package:pokemon_game/api/bloc/game_bloc/game_bloc.dart';
+import 'package:pokemon_game/api/bloc/game_bloc/game_event.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_event.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_names_bloc.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_state.dart';
@@ -30,6 +32,7 @@ class _PokemonViewState extends State<PokemonView> {
   bool isBlackAndWhite = true;
   String pokemonName = '';
   late ConfettiController _confettiController;
+  bool win = false;
 
   @override
   void initState() {
@@ -41,27 +44,36 @@ class _PokemonViewState extends State<PokemonView> {
   @override
   Widget build(BuildContext context) {
     pokemonName = widget.pokemon.name;
-    BlocProvider.of<PokemonNamesBloc>(context)
-        .add(GetRandomPokemonNamesEvent(count: 3));
+    if (!win) {
+      BlocProvider.of<PokemonNamesBloc>(context)
+          .add(GetRandomPokemonNamesEvent(count: 3));
+    }
+
     return Column(
       children: [
-        const Text('Pokemon:'),
         Image.memory(isBlackAndWhite
             ? widget.pokemonArtworkBlackWhite
             : widget.pokemonArtworkColor),
 
-        const Text('What is the name of this pokemon?'),
+        const Text(
+          "Who's That Pokémon?",
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
         // then a bloc builder to show the random names
         BlocBuilder<PokemonNamesBloc, PokemonState>(
           builder: (context, state) {
             if (state is PokemonRandomNamesState) {
               var options = state.pokemonNames;
-              // check if the right answer is in the list
               if (!options.contains(pokemonName)) {
                 options.add(pokemonName);
               }
-
-              // sort randomly the list
               options.shuffle();
 
               return Row(
@@ -76,19 +88,39 @@ class _PokemonViewState extends State<PokemonView> {
                           onPressed: () {
                             if (e == pokemonName) {
                               setState(() {
+                                win = true;
                                 isBlackAndWhite = false;
                               });
                               _confettiController.play();
-                              playSound();
+                              playSucces();
+
+                              BlocProvider.of<PokemonNamesBloc>(context)
+                                  .add(PokemonChosenEvent(e));
+
+                              BlocProvider.of<GameBloc>(context)
+                                  .add(AddWinEvent());
 
                               logger.i('You win');
                             } else {
+                              playFailure();
+                              BlocProvider.of<GameBloc>(context)
+                                  .add(AddLoseEvent());
                               logger.i('You lose');
                             }
                           },
-                          child: Text(e),
+                          child: Text(
+                            '${e[0].toUpperCase()}${e.substring(1)}',
+                          ),
                         ))
                     .toList(),
+              );
+            } else if (state is PokemonChosenWin) {
+              return Text(
+                'You win, the pokemon is: ${pokemonName[0].toUpperCase()}${pokemonName.substring(1)}',
+                style: const TextStyle(
+                    color: Colors.green,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
               );
             } else {
               return const Text('No random names yet');
@@ -115,8 +147,13 @@ class _PokemonViewState extends State<PokemonView> {
     );
   }
 
-  Future<void> playSound() async {
+  Future<void> playSucces() async {
     String audioPath = 'sounds/success.mp3';
+    await player.play(AssetSource(audioPath));
+  }
+
+  Future<void> playFailure() async {
+    String audioPath = 'sounds/failure.mp3';
     await player.play(AssetSource(audioPath));
   }
 }

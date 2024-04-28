@@ -28,5 +28,8 @@ class PokemonNamesBloc extends Bloc<PokemonEvent, PokemonState> {
         emit(PokemonErrorState('Failed to load pokemon'));
       }
     });
+    on<PokemonChosenEvent>((event, emit) {
+      emit(PokemonChosenWin(event.pokemonName));
+    });
   }
 }

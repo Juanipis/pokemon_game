@@ -18,3 +18,12 @@ class GetRandomPokemonNamesEvent extends PokemonEvent {
   @override
   List<Object> get props => [];
 }
+
+class PokemonChosenEvent extends PokemonEvent {
+  final String pokemonName;
+
+  PokemonChosenEvent(this.pokemonName);
+
+  @override
+  List<Object> get props => [pokemonName];
+}

@@ -44,3 +44,12 @@ class PokemonRandomNamesState extends PokemonState {
   @override
   List<Object> get props => [pokemonNames];
 }
+
+class PokemonChosenWin extends PokemonState {
+  final String message;
+
+  PokemonChosenWin(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
