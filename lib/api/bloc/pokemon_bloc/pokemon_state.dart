@@ -5,6 +5,11 @@ import 'package:pokemon_game/api/models/pokemon.dart';
 
 abstract class PokemonState extends Equatable {}
 
+class PokemonInitial extends PokemonState {
+  @override
+  List<Object> get props => [];
+}
+
 class PokemonLoadingState extends PokemonState {
   @override
   List<Object> get props => [];

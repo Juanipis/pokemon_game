@@ -6,7 +6,7 @@ import 'package:pokemon_game/api/service/pokemon_to_black.dart';
 
 class PokemonBloc extends Bloc<PokemonEvent, PokemonState> {
   final PokemonService pokemonService;
-  PokemonBloc(this.pokemonService) : super(PokemonLoadingState()) {
+  PokemonBloc(this.pokemonService) : super(PokemonInitial()) {
     on<GetPokemonByIdEvent>((event, emit) async {
       emit(PokemonLoadingState());
       try {

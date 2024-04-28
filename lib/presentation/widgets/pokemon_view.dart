@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
@@ -23,9 +25,18 @@ class PokemonView extends StatefulWidget {
 }
 
 class _PokemonViewState extends State<PokemonView> {
+  final player = AudioPlayer();
   Logger logger = Logger();
   bool isBlackAndWhite = true;
   String pokemonName = '';
+  late ConfettiController _confettiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 3));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +78,9 @@ class _PokemonViewState extends State<PokemonView> {
                               setState(() {
                                 isBlackAndWhite = false;
                               });
+                              _confettiController.play();
+                              playSound();
+
                               logger.i('You win');
                             } else {
                               logger.i('You lose');
@@ -81,7 +95,28 @@ class _PokemonViewState extends State<PokemonView> {
             }
           },
         ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            emissionFrequency: 0.7,
+            shouldLoop: false,
+            colors: const [
+              Colors.green,
+              Colors.blue,
+              Colors.pink,
+              Colors.orange,
+              Colors.purple
+            ],
+          ),
+        )
       ],
     );
+  }
+
+  Future<void> playSound() async {
+    String audioPath = 'sounds/success.mp3';
+    await player.play(AssetSource(audioPath));
   }
 }
