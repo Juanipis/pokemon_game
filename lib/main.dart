@@ -9,6 +9,7 @@ import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_names_bloc.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_state.dart';
 import 'package:pokemon_game/api/service/pokemon_service.dart';
 import 'package:pokemon_game/presentation/widgets/pokemon_view.dart';
+import 'package:flutter_svg/svg.dart'; // Import flutter_svg package
 
 void main() {
   final PokemonService pokemonService = PokemonService();
@@ -33,13 +34,17 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
             useMaterial3: true,
-            // to improve the Title of the navigation bar
             appBarTheme: const AppBarTheme(
               titleTextStyle: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+            buttonTheme: ButtonThemeData(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              buttonColor: Colors.yellowAccent,
             ),
           ),
           home: const MyHomePage(
@@ -61,75 +66,107 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: Center(child: Text(widget.title)),
-        ),
-        body: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                // Show the win and lose count
-                BlocBuilder<GameBloc, GameState>(builder: (context, state) {
-                  if (state is GameWinState) {
-                    return Text(
-                      'Wins: ${state.wins}, Loses: ${state.loses}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    );
-                  } else if (state is GameLoseState) {
-                    return Text(
-                      'Wins: ${state.wins}, Loses: ${state.loses}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    );
-                  } else {
-                    return const Text(
-                      'Wins: 0, Loses: 0',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    );
-                  }
-                }),
-
-                BlocBuilder<PokemonBloc, PokemonState>(
-                    builder: (context, state) {
-                  if (state is PokemonLoadingState) {
-                    return const CircularProgressIndicator();
-                  } else if (state is PokemonLoadedState) {
-                    return PokemonView(
-                      pokemon: state.pokemon,
-                      pokemonArtworkColor: state.pokemonArtworkColor,
-                      pokemonArtworkBlackWhite: state.pokemonArtworkBlackWhite,
-                    );
-                  } else if (state is PokemonErrorState) {
-                    return Text(state.message);
-                  } else {
-                    return const Text('Press the button to get a Pokemon');
-                  }
-                })
-              ],
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        centerTitle: true,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center, // Center title
+          children: <Widget>[
+            SvgPicture.asset(
+                'images/pikachu.svg', // Replace with your actual asset path
+                height: 40, // Adjust the size to fit your AppBar design
+                width: 40,
+                colorFilter: const ColorFilter.mode(
+                    Colors.yellow,
+                    BlendMode
+                        .srcIn) // Adjust the size to fit your AppBar design
+                ),
+            const SizedBox(width: 10), // Space between icon and text
+            Text(
+              widget.title,
+              style: const TextStyle(
+                fontFamily:
+                    'YourCustomFont', // Replace with your actual font family
+                fontSize: 24, // Adjust the size accordingly
+                fontWeight: FontWeight.bold,
+              ),
             ),
+          ],
+        ),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              BlocBuilder<GameBloc, GameState>(builder: (context, state) {
+                if (state is GameWinState) {
+                  return Text(
+                    'Wins: ${state.wins}, Loses: ${state.loses}',
+                    style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green),
+                  );
+                } else if (state is GameLoseState) {
+                  return Text(
+                    'Wins: ${state.wins}, Loses: ${state.loses}',
+                    style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  );
+                }
+                return Container();
+              }),
+              BlocBuilder<PokemonBloc, PokemonState>(builder: (context, state) {
+                if (state is PokemonLoadingState) {
+                  return const CircularProgressIndicator();
+                } else if (state is PokemonLoadedState) {
+                  return PokemonView(
+                    pokemon: state.pokemon,
+                    pokemonArtworkColor: state.pokemonArtworkColor,
+                    pokemonArtworkBlackWhite: state.pokemonArtworkBlackWhite,
+                  );
+                } else if (state is PokemonErrorState) {
+                  return Text(state.message);
+                } else {
+                  return const Text('Press the button to start the game');
+                }
+              }),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            context.read<PokemonBloc>().add(GetPokemonByIdEvent(
-                  Random().nextInt(1025),
-                ));
-          },
-          tooltip: 'Increment',
-          child: const Icon(Icons.play_arrow),
-        ));
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 10.0,
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {
+                context.read<PokemonBloc>().add(GetPokemonByIdEvent(
+                      Random().nextInt(1024) + 1,
+                    ));
+              },
+              icon: const Icon(
+                Icons.catching_pokemon,
+                size: 30,
+              ),
+              label: const Text('Get Pokémon', style: TextStyle(fontSize: 16)),
+              // to make an overlay on the button
+              style: ButtonStyle(
+                shadowColor: MaterialStateProperty.all(Colors.red),
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

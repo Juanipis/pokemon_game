@@ -51,89 +51,138 @@ class _PokemonViewState extends State<PokemonView> {
 
     return Column(
       children: [
-        Image.memory(isBlackAndWhite
-            ? widget.pokemonArtworkBlackWhite
-            : widget.pokemonArtworkColor),
+        Card(
+          elevation: 10,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            child: Image.memory(
+              isBlackAndWhite
+                  ? widget.pokemonArtworkBlackWhite
+                  : widget.pokemonArtworkColor,
+              key: ValueKey(isBlackAndWhite),
+              height: 400,
+            ),
+          ),
+        ),
 
-        const Text(
-          "Who's That Pokémon?",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            "Who's That Pokémon?",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
           ),
         ),
         const SizedBox(
-          height: 20,
+          height: 10,
         ),
         // then a bloc builder to show the random names
         BlocBuilder<PokemonNamesBloc, PokemonState>(
           builder: (context, state) {
             if (state is PokemonRandomNamesState) {
-              var options = state.pokemonNames;
+              var options = List<String>.from(state.pokemonNames);
               if (!options.contains(pokemonName)) {
-                options.add(pokemonName);
+                options.add(
+                    pokemonName); // Ensure the correct name is in the options.
               }
-              options.shuffle();
+              options
+                  .shuffle(); // Shuffle the options to randomize their order.
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                // We are making a game where we have to guess the pokemon
-                // So each option is a buttom, if we click on the right one
-                // we win, if we click on the wrong one we lose
-                // we need to add the rigth answer to the list of options
-                // so we can check if the user clicked on the right one
-                children: options
-                    .map((e) => ElevatedButton(
-                          onPressed: () {
-                            if (e == pokemonName) {
-                              setState(() {
-                                win = true;
-                                isBlackAndWhite = false;
-                              });
-                              _confettiController.play();
-                              playSucces();
-
-                              BlocProvider.of<PokemonNamesBloc>(context)
-                                  .add(PokemonChosenEvent(e));
-
-                              BlocProvider.of<GameBloc>(context)
-                                  .add(AddWinEvent());
-
-                              logger.i('You win');
-                            } else {
-                              playFailure();
-                              BlocProvider.of<GameBloc>(context)
-                                  .add(AddLoseEvent());
-                              logger.i('You lose');
-                            }
-                          },
-                          child: Text(
-                            '${e[0].toUpperCase()}${e.substring(1)}',
-                          ),
-                        ))
-                    .toList(),
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: options.map((name) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        if (name == pokemonName) {
+                          setState(() {
+                            win = true;
+                            isBlackAndWhite = false;
+                          });
+                          _confettiController.play();
+                          playSucces();
+                          BlocProvider.of<PokemonNamesBloc>(context)
+                              .add(PokemonChosenEvent(name));
+                          BlocProvider.of<GameBloc>(context).add(AddWinEvent());
+                          logger.i('You win');
+                        } else {
+                          playFailure();
+                          BlocProvider.of<GameBloc>(context)
+                              .add(AddLoseEvent());
+                          logger.i('You lose');
+                        }
+                      },
+                      child: Text(
+                        name.substring(0, 1).toUpperCase() +
+                            name.substring(1), // Capitalize the first letter
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               );
             } else if (state is PokemonChosenWin) {
-              return Text(
-                'You win, the pokemon is: ${pokemonName[0].toUpperCase()}${pokemonName.substring(1)}',
-                style: const TextStyle(
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'Correct! It\'s ${pokemonName[0].toUpperCase()}${pokemonName.substring(1)}',
+                  style: const TextStyle(
                     color: Colors.green,
                     fontSize: 20,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
+            } else if (state is PokemonErrorState) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  state.message,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 18,
+                  ),
+                ),
               );
             } else {
-              return const Text('No random names yet');
+              // This covers the initial state or any unhandled state
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'Guess the Pokémon name!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              );
             }
           },
         ),
+
         Align(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.center,
           child: ConfettiWidget(
             confettiController: _confettiController,
             blastDirectionality: BlastDirectionality.explosive,
-            emissionFrequency: 0.7,
-            shouldLoop: false,
+            particleDrag:
+                0.05, // increase the drag so that the confetti falls slower
+            emissionFrequency: 0.6,
+            numberOfParticles: 10, // a lot of particles at once
+            gravity: 0.2,
             colors: const [
               Colors.green,
               Colors.blue,

@@ -42,6 +42,7 @@ dependencies:
   image: ^4.1.7
   confetti: ^0.7.0
   audioplayers: ^6.0.0
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,7 @@ flutter:
 
   assets:
     - assets/sounds/
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
