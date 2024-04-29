@@ -9,7 +9,6 @@ import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_names_bloc.dart';
 import 'package:pokemon_game/api/bloc/pokemon_bloc/pokemon_state.dart';
 import 'package:pokemon_game/api/service/pokemon_service.dart';
 import 'package:pokemon_game/presentation/widgets/pokemon_view.dart';
-import 'package:flutter_svg/svg.dart'; // Import flutter_svg package
 
 void main() {
   final PokemonService pokemonService = PokemonService();
@@ -72,15 +71,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center, // Center title
           children: <Widget>[
-            SvgPicture.asset(
-                'images/pikachu.svg', // Replace with your actual asset path
-                height: 40, // Adjust the size to fit your AppBar design
-                width: 40,
-                colorFilter: const ColorFilter.mode(
-                    Colors.yellow,
-                    BlendMode
-                        .srcIn) // Adjust the size to fit your AppBar design
-                ),
+            Image.asset(
+              'assets/images/pikachu.png',
+              height: 40,
+            ),
             const SizedBox(width: 10), // Space between icon and text
             Text(
               widget.title,
